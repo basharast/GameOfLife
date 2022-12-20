@@ -1,0 +1,166 @@
+﻿<Page
+    x:Name="Golpage"
+    x:Class="GameOfLife.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GameOfLife"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" 
+     >
+
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ScrollViewer Canvas.ZIndex="2" x:Name="SettingsPage" Padding="10,10,0,0"  Background="#dd000000" Visibility="Collapsed" MaxWidth="220" HorizontalAlignment="Left" Grid.Row="0" Grid.RowSpan="2">
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Vertical" Grid.Row="0">
+                    <TextBlock FontSize="14" VerticalAlignment="Center" Foreground="Green">Cell Width</TextBlock>
+                    <TextBlock Margin="0,0,5,0" FontSize="12" VerticalAlignment="Center" Foreground="Orange">Small width is (heavy)</TextBlock>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="ElemWidth" Text="50" Width="90" ToolTipService.ToolTip="Cell width in pixel."></TextBox>
+                        <Button x:Name="BtnSet" Margin="5,0" Click="BtnSet_Click">BUILD</Button>
+                    </StackPanel>
+
+                    <TextBlock Margin="0,5,0,0" FontSize="14" VerticalAlignment="Center" Foreground="Yellow">Build Animation</TextBlock>
+
+                    <ToggleSwitch x:Name="DrawCellsState" Margin="0,-2,0,0"   OffContent="OFF" OnContent="ON"  IsOn="True"/>
+
+                </StackPanel>
+
+                <StackPanel Margin="0,10" Grid.Row="1">
+                    <TextBlock x:Name="ElemTotal" FontSize="14">Total</TextBlock>
+                    <TextBlock Text="{Binding ElementName=Golpage, Path=Info, UpdateSourceTrigger=PropertyChanged, FallbackValue=info}" FontSize="14"/>
+                </StackPanel>
+                
+                <StackPanel Margin="0,15,0,0"  Grid.Row="2">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="14" VerticalAlignment="Center" Foreground="Pink">Fill (</TextBlock>
+                        <TextBlock Margin="2,0,0,0" Text="{Binding ElementName=percentSlider, Path=Value, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTipService.ToolTip="Cell width in pixel."></TextBlock>
+                        <TextBlock Margin="0,0,2,0" Text="%" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTipService.ToolTip="Cell width in pixel."></TextBlock>
+                        <TextBlock FontSize="14" VerticalAlignment="Center" Foreground="Pink">)</TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Slider x:Name="percentSlider" Width="120" Minimum="0" Maximum="100" Value="15"/>
+                        </StackPanel>
+                    <TextBlock Margin="0,5,5,0" FontSize="12" VerticalAlignment="Center" Foreground="Orange">High percentage is (heavy)</TextBlock>
+
+                    <Button x:Name="BtnFill" IsEnabled="False" Margin="0,0,5,0" HorizontalAlignment="Stretch" Click="BtnFill_Click" >FILL</Button>
+
+                </StackPanel>
+
+                <StackPanel  Margin="0,10,0,0" Grid.Row="3">
+                    <TextBlock Height="15" FontWeight="Bold"></TextBlock>
+                    <TextBlock FontSize="14" VerticalAlignment="Center" Foreground="OrangeRed">Special Cell Color</TextBlock>
+                    <ToggleSwitch OffContent="Single Color" OnContent="Random Colors" IsOn="{x:Bind RandomColors, Mode=TwoWay}"/>
+                    <ToggleSwitch OffContent="Stable OFF" OnContent="Stable ON" Toggled="ToggleSwitchStable_Toggled" IsOn="False"/>
+                    
+                    <TextBlock Margin="0,10,5,0" FontSize="12" VerticalAlignment="Center" Foreground="Orange">Edge: Play then activate</TextBlock>
+                    <TextBlock Margin="0,1,5,0" FontSize="12" VerticalAlignment="Center" Foreground="Orange">Otherwise could cause issues</TextBlock>
+                    <ToggleSwitch OffContent="Edge OFF" OnContent="Edge ON" Toggled="ToggleSwitchSurround_Toggled" IsOn="False"/>
+                </StackPanel>
+
+                <StackPanel Margin="0,15,0,0"  Grid.Row="4">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="14" VerticalAlignment="Center" Foreground="DodgerBlue">Timer (</TextBlock>
+                        <TextBlock Margin="2,0,2,0" Text="{Binding ElementName=timerSlider, Path=Value, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTipService.ToolTip="Cell width in pixel."></TextBlock>
+                        <TextBlock FontSize="14" VerticalAlignment="Center" Foreground="DodgerBlue">ms)</TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Slider x:Name="timerSlider" Width="120" Minimum="1" Maximum="1000" Value="250"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <TextBlock x:Name="ElementLifeCount" Grid.Row="5" FontSize="14" />
+
+            </Grid>
+        </ScrollViewer>
+
+        <Grid x:Name="InfoGrid" Canvas.ZIndex="6" ManipulationMode = "TranslateX, TranslateY, Scale" ManipulationDelta="SensorsGrid_ManipulationDelta"  Visibility="{Binding ElementName=ShowInfoState, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, FallbackValue=True}" Background="#cc000000" Margin="0,0,5,5" Width="150" Padding="10" CornerRadius="5" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+            <Grid.RenderTransform>
+                <CompositeTransform x:Name="SensorsGridTransform" TranslateX="{x:Bind XSCurrent, Mode=OneWay}" TranslateY="{x:Bind YSCurrent, Mode=OneWay}"/>
+            </Grid.RenderTransform>
+            <Grid Grid.Row="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="15"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock FontSize="14" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"  VerticalAlignment="Center" Foreground="DeepSkyBlue">Information</TextBlock>
+
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Status" FontSize="12" Margin="0,0,10,0" Foreground="Gray"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="Count" FontSize="12" HorizontalAlignment="Right" Foreground="Gray"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="%" Margin="0,0,5,0" FontSize="12" HorizontalAlignment="Right" Foreground="Gray"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Life" Foreground="CadetBlue" FontSize="14" Margin="0,0,10,0"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Foreground="CadetBlue" Text="{Binding ElementName=Golpage, Path=LcellsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0}" FontSize="14" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Foreground="CadetBlue" Margin="0,0,5,0"  Text="{Binding ElementName=Golpage, Path=LcellsPercent, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0.0}" FontSize="14" HorizontalAlignment="Right"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Foreground="Tomato" Text="Dead" FontSize="14" Margin="0,0,10,0"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Foreground="Tomato" Text="{Binding ElementName=Golpage, Path=DcellsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0}" FontSize="14" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Row="3" Grid.Column="2" Foreground="Tomato" Margin="0,0,5,0"  Text="{Binding ElementName=Golpage, Path=DcellsPercent, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0.0}" FontSize="14" HorizontalAlignment="Right"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Foreground="Orange" Text="Edge" FontSize="14" Margin="0,0,10,0"/>
+                <TextBlock Grid.Row="5" Grid.Column="1" Foreground="Orange" Text="{Binding ElementName=Golpage, Path=ScellsCount, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0}" FontSize="14" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Row="5" Grid.Column="2" Foreground="Orange" Margin="0,0,5,0"  Text="{Binding ElementName=Golpage, Path=ScellsPercent, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0.0}" FontSize="14" HorizontalAlignment="Right"/>
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Generation" Grid.ColumnSpan="2" Foreground="Green" FontSize="14" Margin="0,0,10,0"/>
+                <TextBlock Grid.Row="6" Grid.Column="1" Foreground="Green" Text="{Binding ElementName=Golpage, Path=Generation, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}" FontSize="14" HorizontalAlignment="Right"/>
+            </Grid>
+        </Grid>
+        
+        
+        <StackPanel x:Name="TopBarGrid" Background="Black" Opacity="0.9" Grid.Row="0" VerticalAlignment="Top">
+            
+        </StackPanel>
+
+        <Grid Grid.Row="1"  x:Name="GenerateStateContainer" Visibility="Collapsed" Background="#cc000000" CornerRadius="5" Canvas.ZIndex="3" Margin="10" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <TextBlock  x:Name="GenerateStateText" Padding="10,5,10,5" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="DodgerBlue" Text="Generating..."  FontSize="24"></TextBlock>
+        </Grid>
+        <Grid x:Name="PlayAreaZoom"  Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Canvas x:Name="Playarea" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" RenderTransformOrigin="0.5,0.5">
+            </Canvas>
+        </Grid>
+        
+        <StackPanel Canvas.ZIndex="5" x:Name="BottomBarGrid" Orientation="Vertical" HorizontalAlignment="Stretch" Grid.Row="2" VerticalAlignment="Bottom">
+            <CommandBar x:Name="ControlsBar" HorizontalAlignment="Stretch">
+                <AppBarButton x:Name="SettingsButton" Icon="Setting" Label="Setting" Click="SettingsButton_Click"></AppBarButton>
+                <AppBarButton x:Name="ClearButton" Icon="Delete" Label="Clear" Click="BtnClear_Click"></AppBarButton>
+                <AppBarButton x:Name="PlayButton" Icon="Play" Label="Play" Click="BtnPlay_Click"></AppBarButton>
+                <AppBarButton x:Name="NextButton" Icon="Next" Label="Next" Click="BtnNext_Click"></AppBarButton>
+                <CommandBar.SecondaryCommands>
+                    <AppBarToggleButton Icon="Help" Label="Information" IsChecked="True" x:Name="ShowInfoState"></AppBarToggleButton>
+                    <AppBarToggleButton Icon="FullScreen" Label="FullScreen" IsChecked="{x:Bind fullScreenState,Mode=OneWay}" Click="FullScreenState_Click" x:Name="FullScreenState"></AppBarToggleButton>
+                    <AppBarSeparator></AppBarSeparator>
+                    <AppBarButton Icon="ContactInfo" Label="About" x:Name="AboutButton" Click="AboutButton_Click"></AppBarButton>
+                    <AppBarButton Icon="Link" Label="GitHub" x:Name="GitHubButton" Click="GitHubButton_Click"></AppBarButton>
+                    <AppBarSeparator></AppBarSeparator>
+                    <AppBarButton Icon="Cancel" Label="Exit" x:Name="CloseButton" Click="CloseButton_Click"></AppBarButton>
+                </CommandBar.SecondaryCommands>
+            </CommandBar>
+        </StackPanel>
+    </Grid>
+</Page>
